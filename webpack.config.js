@@ -1,5 +1,6 @@
 ﻿var path = require('path');
 var HtmlWebpackPlugin = require('html-webpack-plugin');
+var ExtractTextPlugin = require('extract-text-webpack-plugin');
 var webpack = require('webpack');
 var merge = require('webpack-merge');
 
@@ -15,14 +16,6 @@ var common = {
         path: path.resolve(ROOT_PATH, 'build'),
         filename: 'bundle.js'
     },
-    module: {
-        loaders: [
-            {
-                test: /\.css$/,
-                loaders: ['style', 'css']
-            }
-        ]
-    },
     plugins: [
         new HtmlWebpackPlugin({
             title: 'Kanban app'
@@ -35,6 +28,10 @@ if (TARGET === 'build') {
         module: {
             loaders: [
                 {
+                    test: /\.css$/,
+                    loader: ExtractTextPlugin.extract('style', 'css')
+                },
+                {
                     test: /\.jsx?$/,
                     loader: 'babel?stage=1',
                     include: path.resolve(ROOT_PATH, 'app')
@@ -42,6 +39,7 @@ if (TARGET === 'build') {
             ]
         },
         plugins: [
+            new ExtractTextPlugin('styles.css'),
             new webpack.DefinePlugin({
                 'process.env': {
                     // This has effect on the react lib size
@@ -61,6 +59,10 @@ if (TARGET === 'dev') {
     module.exports = merge(common, {
         module: {
             loaders: [
+                {
+                    test: /\.css$/,
+                    loaders: ['style', 'css']
+                },
                 {
                     test: /\.jsx?$/,
                     loaders: ['react-hot', 'babel', 'flowcheck', 'babel?stage=1&blacklist=flow'],
